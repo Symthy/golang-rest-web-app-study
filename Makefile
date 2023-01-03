@@ -16,8 +16,8 @@ list:
 	go list ./...
 
 test:
-	go test `go list ./... | grep -v ./e2e`
+	go test ./...
 
 testv:
-	go test -v `go list ./... | grep -v ./e2e`
+	go test -v ./...
 

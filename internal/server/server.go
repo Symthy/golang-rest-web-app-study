@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 
 	"golang.org/x/sync/errgroup"
 )
 
-func Run(ctx context.Context) error {
+func Run(ctx context.Context, l net.Listener) error {
 	s := &http.Server{
-		Addr: ":18080",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 		}),
@@ -19,7 +19,7 @@ func Run(ctx context.Context) error {
 
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := s.Serve(l); err != nil && err != http.ErrServerClosed {
 			log.Printf("failed to close: %+v", err)
 			return err
 		}
