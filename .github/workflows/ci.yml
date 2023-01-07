@@ -1,0 +1,31 @@
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "**.go"
+      - .github/workflows/golangci.yml
+
+name: ci
+jobs:
+  golangci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ">=1.19"
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.29
+
+      - name: Testing
+        run: go test ./... -coverprofile=coverage.out
+
+      - name: Coverage Report Out
+        uses: k1LoW/octocov-action@v0
