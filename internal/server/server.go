@@ -7,10 +7,22 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/Symthy/golang-rest-web-app-study/internal/config"
 	"golang.org/x/sync/errgroup"
 )
 
-func Run(ctx context.Context, l net.Listener) error {
+func Run(ctx context.Context) error {
+	cfg, err := config.New()
+	if err != nil {
+		return err
+	}
+	l, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
+	if err != nil {
+		return err
+	}
+	url := fmt.Sprintf("http://%s", l.Addr().String())
+	log.Printf("start with: %v", url)
+
 	s := &http.Server{
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
