@@ -20,8 +20,12 @@ func serverStartup(t *testing.T) string {
 	eg, ctx := errgroup.WithContext(ctx)
 	l, err := net.Listen("tcp", "localhost:0")
 	require.NoError(t, err)
+	mux := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+	})
 	eg.Go(func() error {
-		return Run(ctx)
+		s := NewServer(l, mux)
+		return s.Run(ctx)
 	})
 
 	t.Cleanup(func() {
@@ -33,8 +37,7 @@ func serverStartup(t *testing.T) string {
 	return baseUri
 }
 
-func TestRun(t *testing.T) {
-	t.Skip("refactering now")
+func TestServerRun(t *testing.T) {
 	baseUri := serverStartup(t)
 
 	in := "world"
