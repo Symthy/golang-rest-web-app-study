@@ -1,7 +1,9 @@
-.PHONY: clean lint build run list test testv 
+.PHONY: all clean lint build run list test testv 
 
 .DEFAULT_GOAL := help
 DOCKER_TAG := latest
+
+all: clean lint build test 
 
 clean:
 	rm -f bin/*
@@ -10,10 +12,13 @@ lint:
 	gofmt -l -s -w .
 
 build:
-	go build --race -o ./bin/main.exe cmd/server/main.go
+	go build -o ./bin/main.exe ./cmd/main.go
+
+buildrace:
+	go build --race -o ./bin/main.exe ./cmd/main.go
 
 run:
-	go run cmd/server/main.go
+	go run cmd/main.go
 
 list:
 	go list ./...
@@ -23,6 +28,9 @@ test: ## Execute tests
 
 testv: ## Execute tests (detail view)
 	go test -shuffle=on -v ./...
+
+testrace: 
+	go test -race -shuffle=on -v ./...
 
 container-build: ## Build docker image for deploy
 	docker build -t symthy/go-app-study:${DOCKER_TAG} --target deploy ./
